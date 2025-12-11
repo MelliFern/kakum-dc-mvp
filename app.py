@@ -1,4 +1,7 @@
 import os
+import csv
+from datetime import datetime
+
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from openai import OpenAI
@@ -11,83 +14,286 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 
-# System prompt for Dream Chaser application helper
-SYSTEM_PROMPT = """
-You are helping a student draft a scholarship application for the 
-"Dream Chaser" program by the Light Your Mind Foundation (LYM).
+CSV_FILE_PATH = "data/kakum_responses.csv"
 
-Using the answers provided, write a clear, honest, and encouraging 
-application in the student's voice (simple English, not too fancy).
+# -------- PROMPTS -------- #
 
-Structure the application using these sections:
+SYSTEM_PROMPT_SUMMARY = """
+You are helping Melissa from the Light Your Mind Foundation understand a 10th grade student's mindset.
 
-1. Personal Background
-2. Academic Journey
-3. Financial Situation
-4. Support System & Challenges
-5. Future Dreams & Career Plan
-6. How the Dream Chaser Scholarship Will Help
+You will be given answers from a student about:
+- who they are
+- their studies
+- their dreams for the future
+- their support system
+- their challenges
+- their financial situation
+- their access to technology
+- how hopeful and confident they feel
 
-While drafting, keep in mind these evaluation criteria:
-- Feasibility of Career Choice
-- Initiative & Self-Drive
-- Mentorship & Role Models
-- Resilience & Problem-Solving
-- Financial Need & Support System
+Please create a clear, simple summary in English using these sections:
 
-Do NOT invent facts. Use only what the student has shared. 
-If some information is missing, write gently around it without making things up.
-Keep the tone warm, respectful, and authentic.
+1. Student Snapshot (age, grade, school, location + 2–3 words that describe them)
+2. Academic Profile (favorite subjects, difficult subjects, study pattern)
+3. Future Dreams & Career Direction (what they want to become + how clear/realistic it seems)
+4. Support System & Role Models (who supports them, who they talk to, any role models)
+5. Challenges & Barriers (study-related, emotional, financial, or environmental)
+6. Financial Context (how likely they are to need financial support for higher education)
+7. Hopefulness & Confidence (how hopeful and confident they feel about their future)
+8. Technology Access (phone/internet/app comfort level)
+9. Suggestions for Kakum (2–3 ideas on what kind of guidance or features would help this student)
+
+Rules:
+- Do NOT invent facts. Only use what the student shared.
+- If something is missing, say "Not clearly mentioned" instead of guessing.
+- Keep the tone kind, respectful, and practical.
+- This summary is for Melissa and the Kakum team (not for the student directly).
 """
+
+SYSTEM_PROMPT_APPLICATION = """
+You are helping a 10th grade student write an application letter to the Light Your Mind Foundation (LYM).
+
+LYM Foundation has agreed to sponsor 2 months of coaching to help students prepare for their Board exams.
+The student is applying for this scholarship/funding.
+
+You will be given the student's answers about:
+- their background and studies
+- their future dreams
+- their challenges
+- their financial situation
+- their support system
+- their level of hope and confidence
+
+Write a short, clear application letter in simple English, as if written by the student.
+
+Structure:
+- Start with a respectful greeting: "Dear Light Your Mind Foundation team,"
+- Brief self-introduction (name, class, school, location)
+- Mention their academic interests and goals
+- Explain why Board exam coaching support is important for them
+- Explain their financial situation in simple, honest words
+- Mention any challenges they face (study environment, family responsibilities, etc.)
+- Express how this 2-month coaching will help them in their exams and future
+- End with gratitude and a polite closing
+
+Tone:
+- Respectful, sincere, and hopeful
+- Simple English (10th grade level)
+- No exaggeration and no invented facts
+
+Rules:
+- Do NOT add details that are not present in the student's answers.
+- You may combine and rephrase their answers, but not fabricate new information.
+- If some details are missing (for example, exact marks), you can keep it general.
+- The letter should be 250–450 words.
+"""
+
 
 def build_user_prompt(form_data):
     """Turn form fields into a clean text prompt for the model."""
     lines = [
+        "KAKUM 10TH GRADE INTAKE RESPONSES",
+        "",
         f"Name: {form_data.get('name', '')}",
         f"Age: {form_data.get('age', '')}",
-        f"City/Country: {form_data.get('location', '')}",
+        f"Gender: {form_data.get('gender', '')}",
+        f"School: {form_data.get('school', '')}",
+        f"Location: {form_data.get('location', '')}",
+        f"Email: {form_data.get('email', '')}",
         "",
-        "Academic Background:",
-        form_data.get("academic_background", ""),
+        "ACADEMIC PROFILE",
+        f"Favorite subjects: {form_data.get('favorite_subjects', '')}",
+        f"Subjects they find difficult: {form_data.get('difficult_subjects', '')}",
+        f"Daily study hours: {form_data.get('study_hours', '')}",
+        f"Tuitions/coaching: {form_data.get('tuitions', '')}",
         "",
-        "Financial Situation:",
-        form_data.get("financial_situation", ""),
+        "SELF-PERCEPTION",
+        f"Describe yourself in 3 words: {form_data.get('self_words', '')}",
+        f"Something they are proud of: {form_data.get('proud_of', '')}",
+        f"Something they want to improve: {form_data.get('improve', '')}",
         "",
-        "Support System / Family Structure:",
-        form_data.get("support_system", ""),
+        "FUTURE DREAMS & PLANS",
+        f"Career goal: {form_data.get('career_goal', '')}",
+        f"Why this path: {form_data.get('career_reason', '')}",
+        f"What they think they need to reach this goal: {form_data.get('needs_for_goal', '')}",
+        f"Know anyone in that field: {form_data.get('knows_someone_in_field', '')}",
         "",
-        "Future Dreams & Plans:",
-        form_data.get("future_plans", ""),
+        "SUPPORT SYSTEM & EXPECTATIONS",
+        f"Who they ask for advice: {form_data.get('advice_from', '')}",
+        f"Expectations from teachers/school: {form_data.get('expect_school', '')}",
+        f"Expectations from adults/the world: {form_data.get('expect_world', '')}",
+        f"If they could ask for one kind of help: {form_data.get('one_help', '')}",
         "",
-        "Anything else the student wants to share:",
-        form_data.get("extra_info", "")
+        "HOPE & CONFIDENCE",
+        f"Hopefulness (1-10): {form_data.get('hope_score', '')}",
+        f"Confidence (1-10): {form_data.get('confidence_score', '')}",
+        f"Biggest worry about the future: {form_data.get('biggest_worry', '')}",
+        "",
+        "FINANCIAL SITUATION",
+        f"Family can support higher education: {form_data.get('family_support_education', '')}",
+        f"Need a scholarship: {form_data.get('need_scholarship', '')}",
+        f"Biggest financial concerns: {form_data.get('financial_concerns', '')}",
+        "",
+        "CHALLENGES & BARRIERS",
+        f"Problems that make it hard to study: {form_data.get('study_problems', '')}",
+        f"What stops them from thinking big: {form_data.get('limits_big_thinking', '')}",
+        f"Biggest challenge right now: {form_data.get('biggest_challenge', '')}",
+        "",
+        "TECHNOLOGY ACCESS",
+        f"Has smartphone: {form_data.get('has_smartphone', '')}",
+        f"Internet access: {form_data.get('internet_access', '')}",
+        f"Comfort using apps: {form_data.get('apps_comfort', '')}",
     ]
+
     return "\n".join(lines)
+
+
+def save_to_csv(form_data, summary_text, application_text, csv_path=CSV_FILE_PATH):
+    """
+    Save form responses + AI summary + scholarship application to a CSV file.
+    Each submission becomes one row.
+    """
+    # Make sure the folder exists (data/)
+    os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+
+    fieldnames = [
+        "timestamp",
+        "name",
+        "age",
+        "gender",
+        "school",
+        "location",
+        "email",
+        "favorite_subjects",
+        "difficult_subjects",
+        "study_hours",
+        "tuitions",
+        "self_words",
+        "proud_of",
+        "improve",
+        "career_goal",
+        "career_reason",
+        "needs_for_goal",
+        "knows_someone_in_field",
+        "advice_from",
+        "expect_school",
+        "expect_world",
+        "one_help",
+        "hope_score",
+        "confidence_score",
+        "biggest_worry",
+        "family_support_education",
+        "need_scholarship",
+        "financial_concerns",
+        "study_problems",
+        "limits_big_thinking",
+        "biggest_challenge",
+        "has_smartphone",
+        "internet_access",
+        "apps_comfort",
+        "ai_summary",
+        "scholarship_application",
+    ]
+
+    row = {
+        "timestamp": datetime.utcnow().isoformat(),
+        "name": form_data.get("name", ""),
+        "age": form_data.get("age", ""),
+        "gender": form_data.get("gender", ""),
+        "school": form_data.get("school", ""),
+        "location": form_data.get("location", ""),
+        "email": form_data.get("email", ""),
+        "favorite_subjects": form_data.get("favorite_subjects", ""),
+        "difficult_subjects": form_data.get("difficult_subjects", ""),
+        "study_hours": form_data.get("study_hours", ""),
+        "tuitions": form_data.get("tuitions", ""),
+        "self_words": form_data.get("self_words", ""),
+        "proud_of": form_data.get("proud_of", ""),
+        "improve": form_data.get("improve", ""),
+        "career_goal": form_data.get("career_goal", ""),
+        "career_reason": form_data.get("career_reason", ""),
+        "needs_for_goal": form_data.get("needs_for_goal", ""),
+        "knows_someone_in_field": form_data.get("knows_someone_in_field", ""),
+        "advice_from": form_data.get("advice_from", ""),
+        "expect_school": form_data.get("expect_school", ""),
+        "expect_world": form_data.get("expect_world", ""),
+        "one_help": form_data.get("one_help", ""),
+        "hope_score": form_data.get("hope_score", ""),
+        "confidence_score": form_data.get("confidence_score", ""),
+        "biggest_worry": form_data.get("biggest_worry", ""),
+        "family_support_education": form_data.get("family_support_education", ""),
+        "need_scholarship": form_data.get("need_scholarship", ""),
+        "financial_concerns": form_data.get("financial_concerns", ""),
+        "study_problems": form_data.get("study_problems", ""),
+        "limits_big_thinking": form_data.get("limits_big_thinking", ""),
+        "biggest_challenge": form_data.get("biggest_challenge", ""),
+        "has_smartphone": form_data.get("has_smartphone", ""),
+        "internet_access": form_data.get("internet_access", ""),
+        "apps_comfort": form_data.get("apps_comfort", ""),
+        "ai_summary": summary_text,
+        "scholarship_application": application_text,
+    }
+
+    file_exists = os.path.exists(csv_path)
+
+    with open(csv_path, mode="a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+
+        if not file_exists:
+            writer.writeheader()
+
+        writer.writerow(row)
+
 
 @app.route("/", methods=["GET"])
 def form():
-    """Show the Dream Chaser form."""
+    """Show the Kakum 10th grade intake form."""
     return render_template("form.html")
+
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    """Generate the scholarship application draft using OpenAI."""
+    """Generate the student profile summary + scholarship application using OpenAI."""
     user_prompt = build_user_prompt(request.form)
 
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",   # you can change model later if needed
+    # 1) Internal profile summary (for Kakum/LYM)
+    summary_response = client.chat.completions.create(
+        model="gpt-4.1-mini",
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt}
+            {"role": "system", "content": SYSTEM_PROMPT_SUMMARY},
+            {"role": "user", "content": user_prompt},
         ],
-        temperature=0.7,
+        temperature=0.5,
         max_tokens=1200,
     )
+    summary_text = summary_response.choices[0].message.content
 
-    application_text = response.choices[0].message.content
-    return render_template("result.html", application_text=application_text)
+    # 2) Scholarship application letter (student → LYM Foundation)
+    application_response = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT_APPLICATION},
+            {"role": "user", "content": user_prompt},
+        ],
+        temperature=0.5,
+        max_tokens=900,
+    )
+    application_text = application_response.choices[0].message.content
+
+    # Save both to CSV
+    try:
+        save_to_csv(request.form, summary_text, application_text)
+    except Exception as e:
+        print(f"Error saving to CSV: {e}")
+
+    return render_template(
+        "result.html",
+        student_name=request.form.get("name", ""),
+        summary_text=summary_text,
+        application_text=application_text,
+    )
+
 
 if __name__ == "__main__":
-    # For local + deployment: host/port are configurable
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
