@@ -1,15 +1,120 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Your Dream Chaser Application Draft</title>
-    <meta charset="utf-8" />
-  </head>
-  <body>
-    <h1>Your Application Draft</h1>
-    <p>You can now review, edit, and submit this to the LYM team.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kakum – Profile & Scholarship Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px;
+            line-height: 1.5;
+            background-color: #295988;   /* LYM BLUE */
+            color: #89a3c7;              /* White for page text */
+        }
+    
+        h1, h2 {
+            color: #6d8ab1;              /* Strong white headers */
+            margin-bottom: 12px;
+        }
+    
+        .section, .box {
+            background-color: #ffffff;
+            color: #1f2937;              /* Clean readable text */
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    
+        label {
+            display: block;
+            margin-top: 8px;
+            font-weight: bold;
+            color: #2d3748;              /* Softer dark gray labels */
+        }
+    
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 4px;
+            box-sizing: border-box;
+            border-radius: 6px;
+            border: 1px solid #cbd5e0;    /* Light gray border */
+            background-color: #f2f6fa;   /* SOFT LIGHT BLUE */
+            color: #1f2937;              /* Deep gray text */
+            font-size: 1rem;
+        }
+    
+        textarea {
+            min-height: 70px;
+        }
+    
+        button {
+            background-color: #ffffff;
+            color: #295988;              /* Blue button text */
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    
+        button:hover {
+            background-color: #e6e6e6;
+        }
+    
+        .logo {
+            max-width: 180px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
+        }
+    
+        @media (max-width: 600px) {
+            .logo {
+                max-width: 140px;
+            }
+        }
+    
+        .note {
+            color: #e0ecff;              /* Lightest blue */
+        }
+    </style>
+    
+</head>
+<body>
+    <div style="text-align:center; margin-bottom: 20px;">
+        <img src="/static/lym_logo.jpg"  class="logo" alt="LYM Foundation Logo" 
+             style="max-width: 250px; height: auto;">
+    </div>
 
-    <textarea rows="30" cols="100">{{ application_text }}</textarea>
+    <h1>Kakum Output{% if student_name %} – {{ student_name }}{% endif %}</h1>
 
-    <p><a href="/">← Create another application</a></p>
-  </body>
+    <h2>1. Profile Summary (for Kakum / LYM internal use)</h2>
+    <p class="note">
+        This summary is for Melissa and the Kakum team. You can copy it into your tracker or use it for analysis.
+    </p>
+    <div class="box">
+        {{ summary_text }}
+    </div>
+
+    <h2>2. Scholarship Application Draft (for LYM Foundation)</h2>
+    <p class="note">
+        This is a draft application letter for 2 months of Board exam coaching support from the Light Your Mind Foundation.
+        You can review, edit if needed, then use it as the student's application.
+    </p>
+    <div class="box">
+        {{ application_text }}
+    </div>
+
+    <a href="/" class="button-link">← Fill another form</a>
+</body>
 </html>

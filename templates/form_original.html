@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+	<div style="max-width: 700px; margin: auto; padding: 20px;">
+	  <head>
+		<title>Kakum – Dream Chaser Application Helper</title>
+		<meta charset="utf-8" />
+		<style>
+		  textarea, input[type="text"] {
+			width: 100%;
+			padding: 10px;
+			margin-top: 6px;
+			border-radius: 6px;
+			border: 1px solid #ccc;
+			font-size: 16px;
+		  }
+
+		  button {
+			background-color: #295988;  /* LYMT blue */
+			color: white;
+			padding: 12px 20px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			font-size: 16px;
+			margin-top: 20px;
+		  }
+
+		  button:hover {
+			background-color: #295988;
+		  }
+
+		  body {
+			font-family: Arial, sans-serif;
+			background-color: #ECF1F8;
+		  }
+
+		  .container {
+			max-width: 700px;
+			margin: auto;
+			padding: 20px;
+			background: white;
+			border-radius: 10px;
+			box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+		  }
+
+		  h1 {
+			text-align: center;
+			color: #3a7a29;
+		  }
+		</style>
+	  </head>
+	  <body>
+		<h1 style="text-align:center; color:#295988;">
+			Dream Chaser Scholarship – Application Helper
+		</h1>
+		<p>Please answer the questions below as honestly and fully as you can.</p>
+
+		<form action="/generate" method="post">
+		  <h3>Personal Information</h3>
+		  <label>Name:<br>
+			<input type="text" name="name" required>
+		  </label><br><br>
+
+		  <label>Age:<br>
+			<input type="text" name="age">
+		  </label><br><br>
+
+		  <label>City, State, Country:<br>
+			<input type="text" name="location">
+		  </label><br><br>
+
+		  <h3>Academic Background</h3>
+		  <textarea name="academic_background" rows="5" cols="60"
+			placeholder="Your current course, college, year, important grades, exams, achievements"></textarea><br><br>
+
+		  <h3>Financial Situation</h3>
+		  <textarea name="financial_situation" rows="5" cols="60"
+			placeholder="Family income, who earns, key expenses, any existing support/scholarships"></textarea><br><br>
+
+		  <h3>Support System & Family Structure</h3>
+		  <textarea name="support_system" rows="5" cols="60"
+			placeholder="Who you live with, family support, responsibilities, challenges"></textarea><br><br>
+
+		  <h3>Future Dreams & Plans</h3>
+		  <textarea name="future_plans" rows="5" cols="60"
+			placeholder="Career you want, why, steps you are taking, how this scholarship will help"></textarea><br><br>
+
+		  <h3>Anything else you want to share</h3>
+		  <textarea name="extra_info" rows="4" cols="60"
+			placeholder="Any other important information about your story"></textarea><br><br>
+
+		  <button type="submit">Generate My Application</button>
+		</form>
+	  </body>
+	</div>
+</html>
