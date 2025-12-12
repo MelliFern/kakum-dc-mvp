@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Kakum – 10th Grade Intake Form</title>
+    <title>Light Your Mind – Intake Form</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -95,7 +95,7 @@
         <img src="/static/lym_logo.jpg" class="logo" alt="LYM Foundation Logo" 
              style="max-width: 250px; height: auto;">
     </div>
-    <h1>Kakum – Student Intake Form (10th Grade)</h1>
+    <h1>Student Intake Form (10th Grade)</h1>
     <p class="small-note">
         Please answer in simple English. There are no right or wrong answers. This will help us understand you better.
     </p>
@@ -110,19 +110,19 @@
             <input type="text" id="name" name="name" required>
 
             <label for="age">Age</label>
-            <input type="number" id="age" name="age" min="10" max="20">
+            <input type="number" id="age" name="age" min="10" max="20" required>
 
             <label for="gender">Gender (optional)</label>
-            <input type="text" id="gender" name="gender" placeholder="Girl / Boy / Prefer not to say / Other">
+            <input type="text" id="gender" name="gender" placeholder="Male/Female/NA" required>
 
             <label for="school">School Name</label>
-            <input type="text" id="school" name="school">
+            <input type="text" id="school" name="school" required>
 
             <label for="location">City & State</label>
             <input type="text" id="location" name="location">
 
             <label for="email">Email (yours or parent’s)</label>
-            <input type="email" id="email" name="email">
+            <input type="email" id="email" name="email" required>
         </div>
 
         <!-- ACADEMICS -->
@@ -130,13 +130,13 @@
             <h2>2. Your Studies</h2>
 
             <label for="favorite_subjects">Which subjects do you like the most?</label>
-            <textarea id="favorite_subjects" name="favorite_subjects"></textarea>
+            <textarea id="favorite_subjects" name="favorite_subjects" required></textarea>
 
             <label for="difficult_subjects">Which subjects do you find difficult?</label>
-            <textarea id="difficult_subjects" name="difficult_subjects"></textarea>
+            <textarea id="difficult_subjects" name="difficult_subjects" required></textarea>
 
             <label for="study_hours">On average, how many hours do you study in a day?</label>
-            <input type="text" id="study_hours" name="study_hours" placeholder="Example: 1–2 hours">
+            <input type="text" id="study_hours" name="study_hours" placeholder="Example: 1–2 hours" required>
 
             <label for="tuitions">Are you taking tuitions/coaching now?</label>
             <input type="text" id="tuitions" name="tuitions" placeholder="Yes/No + Details if any">
@@ -147,13 +147,13 @@
             <h2>3. About You</h2>
 
             <label for="self_words">How would you describe yourself in 3 words?</label>
-            <input type="text" id="self_words" name="self_words" placeholder="Example: curious, kind, hard-working">
+            <input type="text" id="self_words" name="self_words" placeholder="Example: curious, kind, hard-working" required>
 
             <label for="proud_of">What is one thing you are proud of?</label>
-            <textarea id="proud_of" name="proud_of"></textarea>
+            <textarea id="proud_of" name="proud_of" required></textarea>
 
             <label for="improve">What is one thing you wish to improve about yourself?</label>
-            <textarea id="improve" name="improve"></textarea>
+            <textarea id="improve" name="improve" required></textarea>
         </div>
 
         <!-- FUTURE DREAMS -->
@@ -161,16 +161,16 @@
             <h2>4. Future Dreams & Plans</h2>
 
             <label for="career_goal">What do you want to become in the future?</label>
-            <input type="text" id="career_goal" name="career_goal" placeholder="Example: doctor, engineer, teacher, artist…">
+            <input type="text" id="career_goal" name="career_goal" placeholder="Example: doctor, engineer, teacher, artist…" required>
 
             <label for="career_reason">Why do you want to choose this path?</label>
-            <textarea id="career_reason" name="career_reason"></textarea>
+            <textarea id="career_reason" name="career_reason" required></textarea>
 
             <label for="needs_for_goal">What do you think you need to reach this goal?</label>
-            <textarea id="needs_for_goal" name="needs_for_goal" placeholder="Example: coaching, guidance, money, good marks…"></textarea>
+            <textarea id="needs_for_goal" name="needs_for_goal" placeholder="Example: coaching, guidance, money, good marks…" required></textarea>
 
             <label for="knows_someone_in_field">Do you know anyone working in this field?</label>
-            <input type="text" id="knows_someone_in_field" name="knows_someone_in_field" placeholder="Yes/No + who">
+            <input type="text" id="knows_someone_in_field" name="knows_someone_in_field" placeholder="Yes/No + who" required>
         </div>
 
         <!-- SUPPORT & EXPECTATIONS -->
@@ -178,13 +178,13 @@
             <h2>5. Support & Expectations</h2>
 
             <label for="advice_from">Who do you usually ask for advice about your future?</label>
-            <input type="text" id="advice_from" name="advice_from" placeholder="Parents / teacher / friend / no one / other">
+            <input type="text" id="advice_from" name="advice_from" placeholder="Parents / teacher / friend / no one / other" required>
 
             <label for="expect_school">What do you expect from your teachers/school to support your dreams?</label>
-            <textarea id="expect_school" name="expect_school"></textarea>
+            <textarea id="expect_school" name="expect_school" required></textarea>
 
             <label for="expect_world">What do you expect from adults or the world?</label>
-            <textarea id="expect_world" name="expect_world"></textarea>
+            <textarea id="expect_world" name="expect_world" required></textarea>
 
             <label for="one_help">If you could ask for one type of help right now, what would it be?</label>
             <textarea id="one_help" name="one_help"></textarea>
@@ -195,13 +195,13 @@
             <h2>6. Hope & Confidence</h2>
 
             <label for="hope_score">On a scale of 1–10, how hopeful do you feel about your future?</label>
-            <input type="number" id="hope_score" name="hope_score" min="1" max="10">
+            <input type="number" id="hope_score" name="hope_score" min="1" max="10" required>
 
             <label for="confidence_score">On a scale of 1–10, how confident are you that you can reach your goals?</label>
-            <input type="number" id="confidence_score" name="confidence_score" min="1" max="10">
+            <input type="number" id="confidence_score" name="confidence_score" min="1" max="10" required>
 
             <label for="biggest_worry">What worries you the most about your future?</label>
-            <textarea id="biggest_worry" name="biggest_worry"></textarea>
+            <textarea id="biggest_worry" name="biggest_worry" required></textarea>
         </div>
 
         <!-- FINANCIAL -->
@@ -209,13 +209,13 @@
             <h2>7. Financial Situation</h2>
 
             <label for="family_support_education">Do you think your family can support your higher education?</label>
-            <input type="text" id="family_support_education" name="family_support_education" placeholder="Yes / Maybe / No / Not sure">
+            <input type="text" id="family_support_education" name="family_support_education" placeholder="Yes / Maybe / No / Not sure" required>
 
             <label for="need_scholarship">Do you think you will need a scholarship?</label>
-            <input type="text" id="need_scholarship" name="need_scholarship" placeholder="Yes / Maybe / No">
+            <input type="text" id="need_scholarship" name="need_scholarship" placeholder="Yes / Maybe / No" required>
 
             <label for="financial_concerns">What are your biggest financial concerns for the future?</label>
-            <textarea id="financial_concerns" name="financial_concerns"></textarea>
+            <textarea id="financial_concerns" name="financial_concerns" required></textarea>
         </div>
 
         <!-- CHALLENGES -->
@@ -223,13 +223,13 @@
             <h2>8. Challenges & Barriers</h2>
 
             <label for="study_problems">What problems make it hard for you to study?</label>
-            <textarea id="study_problems" name="study_problems" placeholder="Time, stress, money, travel, family, health…"></textarea>
+            <textarea id="study_problems" name="study_problems" placeholder="Time, stress, money, travel, family, health…" required></textarea>
 
             <label for="limits_big_thinking">What stops you from dreaming big about your future?</label>
-            <textarea id="limits_big_thinking" name="limits_big_thinking"></textarea>
+            <textarea id="limits_big_thinking" name="limits_big_thinking" required></textarea>
 
             <label for="biggest_challenge">What is the biggest challenge you face right now?</label>
-            <textarea id="biggest_challenge" name="biggest_challenge"></textarea>
+            <textarea id="biggest_challenge" name="biggest_challenge" required></textarea>
         </div>
 
         <!-- TECHNOLOGY -->
@@ -237,16 +237,20 @@
             <h2>9. Technology Access</h2>
 
             <label for="has_smartphone">Do you have access to a smartphone?</label>
-            <input type="text" id="has_smartphone" name="has_smartphone" placeholder="Always / Sometimes / Rarely / Never">
+            <input type="text" id="has_smartphone" name="has_smartphone" placeholder="Always / Sometimes / Rarely / Never" required>
 
             <label for="internet_access">Do you get internet (mobile data / WiFi) regularly?</label>
-            <input type="text" id="internet_access" name="internet_access" placeholder="Always / Sometimes / Rarely / Never">
+            <input type="text" id="internet_access" name="internet_access" placeholder="Always / Sometimes / Rarely / Never" required>
 
-            <label for="apps_comfort">Are you comfortable using apps and websites?</label>
-            <input type="text" id="apps_comfort" name="apps_comfort" placeholder="Yes / Somewhat / No">
+            <label for="ai_usage">Have you ever used an AI app like ChatGPT?</label>
+            <input type="text" id="ai_usage" name="ai_usage" placeholder="Yes / No / Not sure" required>
+
+            <label for="ai_which">If yes, which AI app have you used?</label>
+            <input type="text" id="ai_which" name="ai_which" placeholder="Example: ChatGPT, Google Gemini, Bing AI, None">
+
         </div>
 
-        <button type="submit">Generate Kakum Profile Summary</button>
+        <button type="submit">Generate Scholarship Request</button>
     </form>
 </body>
 </html>
