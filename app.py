@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from openai import OpenAI
 
+from flask import send_file, abort
+
 # Load environment variables from .env
 load_dotenv()
 
@@ -142,7 +144,9 @@ def build_user_prompt(form_data):
         "TECHNOLOGY ACCESS",
         f"Has smartphone: {form_data.get('has_smartphone', '')}",
         f"Internet access: {form_data.get('internet_access', '')}",
-        f"Comfort using apps: {form_data.get('apps_comfort', '')}",
+        f"Used AI apps before: {form_data.get('ai_usage', '')}",
+        f"Which AI app: {form_data.get('ai_which', '')}",
+
     ]
 
     return "\n".join(lines)
@@ -190,7 +194,8 @@ def save_to_csv(form_data, summary_text, application_text, csv_path=CSV_FILE_PAT
         "biggest_challenge",
         "has_smartphone",
         "internet_access",
-        "apps_comfort",
+        "ai_usage",
+        "ai_which",
         "ai_summary",
         "scholarship_application",
     ]
@@ -229,7 +234,8 @@ def save_to_csv(form_data, summary_text, application_text, csv_path=CSV_FILE_PAT
         "biggest_challenge": form_data.get("biggest_challenge", ""),
         "has_smartphone": form_data.get("has_smartphone", ""),
         "internet_access": form_data.get("internet_access", ""),
-        "apps_comfort": form_data.get("apps_comfort", ""),
+        "ai_usage": form_data.get("ai_usage", ""),
+        "ai_which": form_data.get("ai_which", ""),
         "ai_summary": summary_text,
         "scholarship_application": application_text,
     }
@@ -293,6 +299,25 @@ def generate():
         application_text=application_text,
     )
 
+@app.route("/admin/download-csv")
+def download_csv():
+    secret = request.args.get("key")
+
+    # Check authorization key
+    if secret != os.getenv("ADMIN_KEY"):
+        return abort(403)
+
+    csv_path = CSV_FILE_PATH
+
+    if not os.path.exists(csv_path):
+        return "CSV file not found", 404
+
+    return send_file(
+        csv_path,
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="kakum_responses.csv"
+    )
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
