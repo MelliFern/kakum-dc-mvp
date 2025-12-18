@@ -89,6 +89,32 @@ Rules:
 - If some details are missing (for example, exact marks), you can keep it general.
 - The letter should be 250–450 words.
 """
+SYSTEM_PROMPT_ENCOURAGEMENT = """
+You are writing a warm, positive, encouraging message to a 10th grade student from the LYM team.
+
+Context:
+- They completed a career/intake form.
+- The message should be something they can revisit later as they grow and build their career.
+
+Write a message in simple English (10th grade level), 180–300 words.
+Tone: kind, hopeful, motivating, not preachy.
+Rules:
+- Use only information the student shared. Do not invent facts.
+- If some details are missing, keep it general and encouraging.
+- Do NOT mention scholarships, selection, rejection, or funding.
+
+Structure:
+- message should sound like its coming from the team and not individual person
+- A warm opening
+- 2–3 strengths you notice from their answers
+- 2–3 practical next steps they can take in the next few months
+- A positive closing
+
+Formatting rules (important):
+- Write 4 to 6 short paragraphs.
+- Each paragraph must be 1–2 sentences max.
+- Add a blank line between paragraphs.
+"""
 
 
 def build_user_prompt(form_data):
@@ -102,6 +128,7 @@ def build_user_prompt(form_data):
         f"School: {form_data.get('school', '')}",
         f"Location: {form_data.get('location', '')}",
         f"Email: {form_data.get('email', '')}",
+        f"Scholarship 10k (Yes/No): {form_data.get('scholarship_10k', '')}",
         "",
         "ACADEMIC PROFILE",
         f"Favorite subjects: {form_data.get('favorite_subjects', '')}",
@@ -152,7 +179,8 @@ def build_user_prompt(form_data):
     return "\n".join(lines)
 
 
-def save_to_csv(form_data, summary_text, application_text, csv_path=CSV_FILE_PATH):
+def save_to_csv(form_data, summary_text, application_text, encouragement_text, output_type, csv_path=CSV_FILE_PATH):
+
     """
     Save form responses + AI summary + scholarship application to a CSV file.
     Each submission becomes one row.
@@ -198,6 +226,9 @@ def save_to_csv(form_data, summary_text, application_text, csv_path=CSV_FILE_PAT
         "ai_which",
         "ai_summary",
         "scholarship_application",
+        "scholarship_10k",
+        "output_type",
+        "encouragement_message",
     ]
 
     row = {
@@ -238,6 +269,9 @@ def save_to_csv(form_data, summary_text, application_text, csv_path=CSV_FILE_PAT
         "ai_which": form_data.get("ai_which", ""),
         "ai_summary": summary_text,
         "scholarship_application": application_text,
+        "scholarship_10k": form_data.get("scholarship_10k", ""),
+        "output_type": output_type,
+        "encouragement_message": encouragement_text,
     }
 
     file_exists = os.path.exists(csv_path)
@@ -259,10 +293,12 @@ def form():
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    """Generate the student profile summary + scholarship application using OpenAI."""
+    """Generate either scholarship application OR encouragement message based on scholarship selection."""
     user_prompt = build_user_prompt(request.form)
 
-    # 1) Internal profile summary (for Kakum/LYM)
+    scholarship_choice = (request.form.get("scholarship_10k", "") or "").strip().lower()
+
+    # 1) Internal profile summary (keep this for CSV analysis; not shown on results page)
     summary_response = client.chat.completions.create(
         model="gpt-4.1-mini",
         messages=[
@@ -274,29 +310,34 @@ def generate():
     )
     summary_text = summary_response.choices[0].message.content
 
-    # 2) Scholarship application letter (student → LYM Foundation)
-    application_response = client.chat.completions.create(
+    # 2) Conditional output
+    application_text = ""
+    encouragement_text = ""
+    encouragement_response = client.chat.completions.create(
         model="gpt-4.1-mini",
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT_APPLICATION},
+            {"role": "system", "content": SYSTEM_PROMPT_ENCOURAGEMENT},
             {"role": "user", "content": user_prompt},
         ],
-        temperature=0.5,
-        max_tokens=900,
-    )
-    application_text = application_response.choices[0].message.content
+        temperature=0.6,
+        max_tokens=500,
+        )
+    encouragement_text = encouragement_response.choices[0].message.content
+    encouragement_text = encouragement_text.replace("\n", "\n\n")
+    output_type = "encouragement"
 
-    # Save both to CSV
+    # Save to CSV (update function signature in next step)
     try:
-        save_to_csv(request.form, summary_text, application_text)
+        save_to_csv(request.form, summary_text, application_text, encouragement_text, output_type)
     except Exception as e:
         print(f"Error saving to CSV: {e}")
 
     return render_template(
         "result.html",
         student_name=request.form.get("name", ""),
-        summary_text=summary_text,
+        output_type=output_type,
         application_text=application_text,
+        encouragement_text=encouragement_text,
     )
 
 @app.route("/admin/download-csv")
