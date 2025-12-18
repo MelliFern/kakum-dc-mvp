@@ -87,7 +87,11 @@
         .note {
             color: #e0ecff;              /* Lightest blue */
         }
-    </style>
+
+        .lym-note p {
+            margin-bottom: 14px;
+        }
+            </style>
     
 </head>
 <body>
@@ -104,7 +108,7 @@
     <div class="box">
         {{ summary_text }}
     </div>
--->
+
     <h2> Scholarship Application Draft (for LYM Foundation)</h2>
     <p class="note">
         This is a draft application letter for 2 months of Board exam coaching support from the Light Your Mind Foundation.
@@ -114,6 +118,48 @@
         {{ application_text }}
     </div>
 
-    <a href="/" class="button-link">← Fill another form</a>
+    {% if output_type == "scholarship_application" %}
+    <h2>Scholarship Application Draft (for LYM Foundation)</h2>
+    <p class="note">
+        This is a draft application letter for Rs 10,000 scholarship support.
+        Results will be declared in April.
+    </p>
+    <div class="box">
+        {{ application_text }}
+    </div>
+    {% else %}
+    <h2>Your Encouragement Note</h2>
+    <p class="note">
+        You can revisit this message anytime as you grow and build your career.
+    </p>
+    <div class="box">
+        {{ encouragement_text }}
+    </div>
+    {% endif %}
+
+--> 
+
+    <div class="box lym-note">
+        <p><strong>A note from the Light Your Mind team 💛 (with the help of AI Model- ChatGPT)</strong></p>
+
+        {% for para in encouragement_text.split('\n\n') %}
+            {% if para.strip() %}
+            <p>{{ para | safe }}</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="note" style="margin-top: 24px; font-size: 0.85rem;">
+    <strong>AI Disclaimer:</strong><br>
+    This message was generated with the support of an AI tool to help reflect on your answers
+    and provide encouragement. It is meant to guide and inspire, not replace advice from
+    teachers, mentors, or family members. You are always encouraged to seek human guidance
+    as you make decisions about your education and future.
+    </div>
+    <div style="text-align: center; margin-top: 28px;">
+        <button onclick="window.open('https://www.lightyourmind.org/', '_blank')">
+            Visit Light Your Mind
+        </button>
+    </div>
 </body>
 </html>
